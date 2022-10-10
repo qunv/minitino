@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"github.com/qunv/minitino/boot"
+	"github.com/qunv/minitino/app"
 )
 
 func main() {
 	ctx := context.Background()
-	boot.New(ctx).Run()
+	app.New(ctx).Run()
 }

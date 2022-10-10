@@ -4,7 +4,19 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4880199f-dcf0-4156-86f5-b2e687d31b0e" name="Changes" comment="" />
+    <list default="true" id="4880199f-dcf0-4156-86f5-b2e687d31b0e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/app/app.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/boot/app.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/_posts/2021-05-22-bitmask.md" beforeDir="false" afterPath="$PROJECT_DIR$/example/_posts/2021-05-22-bitmask.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/helpers/error.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/helpers/error.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/helpers/file.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/helpers/file.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/helpers/file_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/helpers/file_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/helpers/string.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/helpers/string.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/const.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/index.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/renders.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -42,7 +54,7 @@
     "WebServerToolWindowFactoryState": "false",
     "go.import.settings.migrated": "true",
     "go.sdk.automatically.set": "true",
-    "last_opened_file_path": "/home/juantino/Documents/self/minitino/_posts",
+    "last_opened_file_path": "/home/juantino",
     "settings.editor.selected.configurable": "preferences.keymap"
   }
 }]]></component>
@@ -53,6 +65,7 @@
       <recent name="$PROJECT_DIR$" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app/extractor" />
       <recent name="$PROJECT_DIR$/helpers" />
     </key>
   </component>
