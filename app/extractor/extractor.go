@@ -29,13 +29,15 @@ func (p postExtractor) Extract() []models.Post {
 	var posts []models.Post
 	for _, dir := range dirs {
 		fileName := dir.Name()
-		file, err := helpers.ReadFile(p.dirPath + "/" + fileName)
+		filePath := p.dirPath + "/" + fileName
+		file, err := helpers.ReadFile(filePath)
 		helpers.PanicIfError(err)
 		createdAt := fileName[0:10]
 		title := p.extractTitle(file)
 		tags := p.extractTags(file)
 
 		posts = append(posts, models.Post{
+			FilePath:  filePath,
 			Content:   file.Bytes(),
 			Title:     title,
 			Tags:      tags,
@@ -49,14 +51,14 @@ func (p postExtractor) extractTitle(file *bytes.Buffer) string {
 	fileBytes := file.Bytes()
 
 	title := strings.Split(string(fileBytes), "\n")[0]
-	match, err := regexp.MatchString("^\\[title\\]:<>\\(.*\\)$", title)
+	match, err := regexp.MatchString("^\\[comment\\]: <> \\(.*\\)$", title)
 	helpers.PanicIfError(err)
 	if !match {
 		log.Println("Missing title!")
 		panic("Missing title")
 	}
 
-	title = strings.ReplaceAll(title, "[title]:<>(", "")
+	title = strings.ReplaceAll(title, "[comment]: <> (", "")
 	title = strings.ReplaceAll(title, ")", "")
 	return title
 }
@@ -65,7 +67,7 @@ func (p postExtractor) extractTags(file *bytes.Buffer) []string {
 	fileBytes := file.Bytes()
 
 	tags := strings.Split(string(fileBytes), "\n\n")[1]
-	match, err := regexp.MatchString("^\\[tags\\]:<>\\(.*\\)$", tags)
+	match, err := regexp.MatchString("^\\[comment\\]: <> \\(.*\\)$", tags)
 	helpers.PanicIfError(err)
 
 	if !match {
@@ -73,7 +75,7 @@ func (p postExtractor) extractTags(file *bytes.Buffer) []string {
 		panic("Missing tags")
 	}
 
-	tags = strings.ReplaceAll(tags, "[tags]:<>(", "")
+	tags = strings.ReplaceAll(tags, "[comment]: <> (", "")
 	tags = strings.ReplaceAll(tags, ")", "")
 	return strings.Split(tags, ",")
 }

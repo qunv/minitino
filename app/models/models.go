@@ -3,6 +3,7 @@ package models
 import "bytes"
 
 type Post struct {
+	FilePath  string
 	Title     string
 	CreatedAt string
 	Tags      []string
