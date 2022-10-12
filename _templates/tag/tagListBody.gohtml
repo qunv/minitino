@@ -1,0 +1,11 @@
+{{- define "body" }}
+    <h1 style="font-weight: bold">Tags</h1>
+    <ul class="tags">
+        {{- range .Tags }}
+            <li>
+                <a class="tag__link" href="{{ .Path }}" style="color: #aaa">#{{ .Name }} </a>
+                <span class="tags__count">{{ .Count }}</span>
+            </li>
+        {{- end }}
+    </ul>
+{{- end }}

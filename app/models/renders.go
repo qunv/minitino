@@ -1,13 +1,12 @@
 package models
 
-type Index struct {
-	RootName string
-	Posts    []RPost
-}
-
-type PostInput struct {
+type Input struct {
 	RootName string
 	Post     RPost
+	Posts    []RPost
+	Tag      RTag
+	Tags     []RTag
+	Content  string
 }
 
 type RTag struct {

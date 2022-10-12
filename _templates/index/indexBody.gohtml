@@ -1,0 +1,15 @@
+{{- define "body" }}
+    <ul class="post-list">
+        {{- range .Posts }}
+            <li>
+                <a class="post-link" href="{{ .URL }}">{{ .Title }}</a>
+                <time datetime="2017-01-15T00:00:00+00:00">{{ .Date }}</time>
+                <p>
+                    {{- range .Tags }}
+                        <a href="/tags/{{ . }}" style="color: #aaa">#{{ . }} </a>
+                    {{- end }}
+                </p>
+            </li>
+        {{- end }}
+    </ul>
+{{- end }}
