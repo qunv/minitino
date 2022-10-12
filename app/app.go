@@ -5,6 +5,7 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"github.com/qunv/minitino/app/config"
 	"github.com/qunv/minitino/app/extractor"
 	"github.com/qunv/minitino/app/helpers"
 	"github.com/qunv/minitino/app/models"
@@ -22,6 +23,7 @@ type app struct {
 	ctx           context.Context
 	fs            embed.FS
 	postExtractor extractor.Extractor[[]models.Post]
+	config        config.Config
 }
 
 func (a app) Run() {
@@ -143,7 +145,7 @@ func (a app) renderPostPages() {
 		pars := blackfriday.MarkdownCommon(file.Bytes())
 
 		input := models.Input{
-			RootName: "JUANTINO NG",
+			RootName: a.config.App.RootName,
 			Post: models.RPost{
 				Title:   p.Title,
 				Tags:    p.Tags,
@@ -205,7 +207,7 @@ func (a app) renderTagsPage() {
 		tags = append(tags, *tag)
 	}
 	data := models.Input{
-		RootName: "JUANTINO NG",
+		RootName: a.config.App.RootName,
 		Tags:     tags,
 	}
 	err = t.Execute(b, data)

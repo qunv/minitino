@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"github.com/qunv/minitino/app"
+	"github.com/qunv/minitino/app/config"
 )
 
 //go:embed _assets
@@ -12,5 +13,6 @@ var fs embed.FS
 
 func main() {
 	ctx := context.Background()
-	app.New(ctx, fs).Run()
+	config := config.LoadConfig()
+	app.New(ctx, fs, config).Run()
 }

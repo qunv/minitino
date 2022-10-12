@@ -6,15 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="4880199f-dcf0-4156-86f5-b2e687d31b0e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_assets/styte.css" beforeDir="false" afterPath="$PROJECT_DIR$/_assets/styte.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/_templates/root.gohtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_templates/indexSubHeader.html" beforeDir="false" afterPath="$PROJECT_DIR$/_templates/index/indexSubHeader.gohtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_templates/postBody.html" beforeDir="false" afterPath="$PROJECT_DIR$/_templates/post/postBody.gohtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_templates/postListBody.html" beforeDir="false" afterPath="$PROJECT_DIR$/_templates/index/indexBody.gohtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_templates/postSubHeader.html" beforeDir="false" afterPath="$PROJECT_DIR$/_templates/post/postSubHeader.gohtml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/app.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/boot.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/boot.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/renders.go" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/renders.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -174,7 +169,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/app/app.go</url>
-          <line>32</line>
+          <line>34</line>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
