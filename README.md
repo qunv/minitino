@@ -70,4 +70,4 @@ Happy to your contribution
 
 ## License
 
-Licensed under the [MIT License](https://github.com/qunv/minitino/LICENSE).
+Licensed under the [GNU License](https://github.com/qunv/minitino/blob/main/LICENSE).
