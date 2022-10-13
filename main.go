@@ -13,6 +13,5 @@ var fs embed.FS
 
 func main() {
 	ctx := context.Background()
-	config := config.LoadConfig()
-	app.New(ctx, fs, config).Run()
+	app.New(ctx, fs, config.LoadConfig()).Run()
 }

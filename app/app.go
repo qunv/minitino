@@ -116,7 +116,7 @@ func (a app) renderIndexPage() {
 	b := &bytes.Buffer{}
 
 	data := models.Input{
-		RootName: "JUANTINO NG",
+		RootName: a.config.App.RootName,
 		Posts:    rPosts,
 	}
 	err = t.Execute(b, data)
@@ -181,7 +181,7 @@ func (a app) renderAbout() {
 	pars := blackfriday.MarkdownCommon(file.Bytes())
 
 	input := models.Input{
-		RootName: "JUANTINO NG",
+		RootName: a.config.App.RootName,
 		Content:  string(pars),
 	}
 
@@ -231,7 +231,7 @@ func (a app) renderTagDetailPage() {
 		b := &bytes.Buffer{}
 
 		input := models.Input{
-			RootName: "JUANTINO NG",
+			RootName: a.config.App.RootName,
 			Tag:      *tag,
 		}
 
@@ -249,7 +249,7 @@ func (a app) renderRSS() {
 	b.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
 	b.WriteString("<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n")
 	b.WriteString("<channel>\n")
-	b.WriteString("<title>Quan Nguyen</title>\n")
+	b.WriteString("<title>" + a.config.App.RootName + "</title>\n")
 	b.WriteString("<description>For the Future</description>\n")
 	b.WriteString("<link>https://qunv.github.io/</link>\n")
 	for _, post := range posts {
