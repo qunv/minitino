@@ -5,7 +5,6 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"github.com/qunv/minitino/app/config"
 	"github.com/qunv/minitino/app/extractor"
 	"github.com/qunv/minitino/app/helpers"
 	"github.com/qunv/minitino/app/models"
@@ -23,7 +22,7 @@ type app struct {
 	ctx           context.Context
 	fs            embed.FS
 	postExtractor extractor.Extractor[[]models.Post]
-	config        config.Config
+	config        models.Config
 }
 
 func (a app) Run() {
@@ -116,8 +115,8 @@ func (a app) renderIndexPage() {
 	b := &bytes.Buffer{}
 
 	data := models.Input{
-		RootName: a.config.App.RootName,
-		Posts:    rPosts,
+		Config: a.config,
+		Posts:  rPosts,
 	}
 	err = t.Execute(b, data)
 	if err != nil {
@@ -145,7 +144,7 @@ func (a app) renderPostPages() {
 		pars := blackfriday.MarkdownCommon(file.Bytes())
 
 		input := models.Input{
-			RootName: a.config.App.RootName,
+			Config: a.config,
 			Post: models.RPost{
 				Title:   p.Title,
 				Tags:    p.Tags,
@@ -181,8 +180,8 @@ func (a app) renderAbout() {
 	pars := blackfriday.MarkdownCommon(file.Bytes())
 
 	input := models.Input{
-		RootName: a.config.App.RootName,
-		Content:  string(pars),
+		Config:  a.config,
+		Content: string(pars),
 	}
 
 	err = t.Execute(b, input)
@@ -207,8 +206,8 @@ func (a app) renderTagsPage() {
 		tags = append(tags, *tag)
 	}
 	data := models.Input{
-		RootName: a.config.App.RootName,
-		Tags:     tags,
+		Config: a.config,
+		Tags:   tags,
 	}
 	err = t.Execute(b, data)
 	if err != nil {
@@ -231,8 +230,8 @@ func (a app) renderTagDetailPage() {
 		b := &bytes.Buffer{}
 
 		input := models.Input{
-			RootName: a.config.App.RootName,
-			Tag:      *tag,
+			Config: a.config,
+			Tag:    *tag,
 		}
 
 		err = t.Execute(b, input)
@@ -249,7 +248,7 @@ func (a app) renderRSS() {
 	b.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
 	b.WriteString("<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n")
 	b.WriteString("<channel>\n")
-	b.WriteString("<title>" + a.config.App.RootName + "</title>\n")
+	b.WriteString("<title>" + a.config.RootName + "</title>\n")
 	b.WriteString("<description>For the Future</description>\n")
 	b.WriteString("<link>https://qunv.github.io/</link>\n")
 	for _, post := range posts {

@@ -1,12 +1,12 @@
 package models
 
 type Input struct {
-	RootName string
-	Post     RPost
-	Posts    []RPost
-	Tag      RTag
-	Tags     []RTag
-	Content  string
+	Config  Config
+	Post    RPost
+	Posts   []RPost
+	Tag     RTag
+	Tags    []RTag
+	Content string
 }
 
 type RTag struct {

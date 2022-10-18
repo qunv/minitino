@@ -2,25 +2,11 @@ package config
 
 import (
 	"fmt"
+	"github.com/qunv/minitino/app/models"
 	"github.com/spf13/viper"
 )
 
-type Config struct {
-	App App
-}
-
-type App struct {
-	RootName string
-	Intro    string
-	FindOn   FindOn
-}
-
-type FindOn struct {
-	Github  string
-	Twitter string
-}
-
-func LoadConfig() Config {
+func LoadConfig() models.Config {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
@@ -29,7 +15,7 @@ func LoadConfig() Config {
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
 
-	var c Config
+	var c models.Config
 	err = viper.Unmarshal(&c)
 
 	if err != nil {
