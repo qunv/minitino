@@ -27,7 +27,8 @@ func (p postExtractor) Extract() []models.Post {
 	dirs, err := helpers.ReadDir(p.dirPath)
 	helpers.PanicIfError(err)
 	var posts []models.Post
-	for _, dir := range dirs {
+	for i := len(dirs) - 1; i >= 0; i-- {
+		dir := dirs[i]
 		fileName := dir.Name()
 		filePath := p.dirPath + "/" + fileName
 		file, err := helpers.ReadFile(filePath)
