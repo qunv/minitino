@@ -1,18 +1,17 @@
 package models
 
 const (
-	SysAssetsDir    string = "_assets"
-	SysSectionsDir         = "_sections"
-	SysPostsDir            = "_posts"
-	SysAboutDir            = "_about"
-	SysTemplatesDir        = "_templates"
+	SysAssetsDir string = "_assets"
+	SysPostsDir         = "_posts"
+	SysAboutDir         = "_about"
+	SysPoemDir          = "_poem"
 )
 
 const (
-	AssetsDir   string = "assets"
-	SectionsDir        = "sections"
-	PostsDir           = "posts"
-	AboutDir           = "about"
-	ImagesDir          = "images"
-	TagsDir            = "tags"
+	AssetsDir string = "assets"
+	PostsDir         = "posts"
+	AboutDir         = "about"
+	ImagesDir        = "images"
+	TagsDir          = "tags"
+	PoemDir          = "poem"
 )

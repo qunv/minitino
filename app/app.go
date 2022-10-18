@@ -47,6 +47,7 @@ func (a app) Run() {
 	a.renderTagDetailPage()
 	a.renderAbout()
 	a.renderRSS()
+	a.renderPoem()
 }
 
 func (a app) handleTag(tags []string, path, date, title string) {
@@ -85,12 +86,14 @@ func (a app) makeDir() {
 
 	_ = os.MkdirAll(models.SysPostsDir, 0755)
 	_ = os.MkdirAll(models.SysAboutDir, 0755)
+	_ = os.MkdirAll(models.SysPoemDir, 0755)
 
 	_ = os.MkdirAll(models.PostsDir, 0755)
 	_ = os.MkdirAll(models.AssetsDir, 0755)
 	_ = os.MkdirAll(models.AboutDir, 0755)
 	_ = os.MkdirAll(models.ImagesDir, 0755)
 	_ = os.MkdirAll(models.TagsDir, 0755)
+	_ = os.MkdirAll(models.PoemDir, 0755)
 }
 
 func (a app) renderAssets() {
@@ -189,6 +192,37 @@ func (a app) renderAbout() {
 		panic(err)
 	}
 	err = helpers.WriteFile("about/index.html", b)
+	helpers.PanicIfError(err)
+}
+
+func (a app) renderPoem() {
+	t, err := template.ParseFS(
+		a.fs,
+		"_templates/root.gohtml",
+		"_templates/poem/poemBody.gohtml",
+		"_templates/poem/poemSubHeader.gohtml",
+	)
+	helpers.PanicIfError(err)
+
+	b := &bytes.Buffer{}
+
+	file, err := helpers.ReadFile("_poem/poem.md")
+	if err != nil {
+		return
+	}
+
+	pars := blackfriday.MarkdownCommon(file.Bytes())
+
+	input := models.Input{
+		Config:  a.config,
+		Content: string(pars),
+	}
+
+	err = t.Execute(b, input)
+	if err != nil {
+		panic(err)
+	}
+	err = helpers.WriteFile("poem/index.html", b)
 	helpers.PanicIfError(err)
 }
 
