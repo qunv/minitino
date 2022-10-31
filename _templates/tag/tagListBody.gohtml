@@ -3,7 +3,7 @@
     <ul class="tags">
         {{- range .Tags }}
             <li>
-                <a class="tag__link" href="{{ .Path }}" style="color: #aaa">#{{ .Name }} </a>
+                <a class="tag__link" href="{{ .Path }}">#{{ .Name }} </a>
                 <span class="tags__count">{{ .Count }}</span>
             </li>
         {{- end }}

@@ -287,14 +287,14 @@ func (a app) renderRSS() {
 	b.WriteString("<link>https://qunv.github.io/</link>\n")
 	for _, post := range posts {
 		dateFolder := strings.ReplaceAll(post.CreatedAt, "-", "/")
-		path := "Posts/" + dateFolder + "/" + strings.ReplaceAll(post.Title, " ", "-")
+		path := "posts/" + dateFolder + "/" + strings.ReplaceAll(post.Title, " ", "-")
 		b.WriteString("<item>\n")
 		b.WriteString("<title>" + post.Title + "</title>\n")
 		b.WriteString("<link>https://qunv.github.io/" + path + "</link>\n")
 		b.WriteString("</item>\n")
 	}
 	b.WriteString("</channel>\n")
-	b.WriteString("</rss>")
+	b.WriteString("</rss>\n")
 	err := helpers.WriteFile("rss.xml", &b)
 	helpers.PanicIfError(err)
 }
