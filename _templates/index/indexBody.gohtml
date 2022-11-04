@@ -5,7 +5,7 @@
                 <time datetime="2017-01-15T00:00:00+00:00">{{ .Date }}</time>
                 <a class="post-link" href="{{ .URL }}">{{ .Title }}</a>
                 {{- range .Tags }}
-                    <a class="tag" href="/tags/{{ . }}">#{{ . }} </a>
+                    <a class="tag" href="/tags/{{ . }}">#{{ . }}</a>
                 {{- end }}
             </li>
         {{- end }}

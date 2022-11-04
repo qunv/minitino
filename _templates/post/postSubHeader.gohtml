@@ -7,7 +7,7 @@
         <div class="post-tag">
             <i class="fa fa-tag fa-1x" aria-hidden="true"></i>
             {{- range .Post.Tags }}
-                <a href="/tags/{{ . }}" style="color: #aaa">#{{ . }} </a>
+                <a class="tag" href="/tags/{{ . }}">#{{ . }}</a>
             {{- end }}
         </div>
     </div>

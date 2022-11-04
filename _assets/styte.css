@@ -12,7 +12,7 @@ blockquote, body, dd, dl, figure, h1, h2, h3, h4, h5, h6, hr, ol, p, pre, ul {
 
 body {
     font: 300 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    font-family: athiti, monospace;
+    font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
     color: #333;
     background-color: #fff;
     line-height: 1.725;
@@ -226,8 +226,6 @@ hr {
 }
 
 .post-list > li a {
-    color: var(--main-blue-color);
-    text-decoration: underline;
     font-weight: normal
 }
 
