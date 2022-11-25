@@ -40,7 +40,7 @@ func (a app) Run() {
 		})
 	}
 
-	a.renderAssets()
+	a.renderAssets(models.SysAssetsDir, models.AssetsDir)
 	a.renderIndexPage()
 	a.renderPostPages()
 	a.renderTagsPage()
@@ -96,14 +96,20 @@ func (a app) makeDir() {
 	_ = os.MkdirAll(models.PoemDir, 0755)
 }
 
-func (a app) renderAssets() {
-	dirs, err := a.fs.ReadDir("_assets")
+func (a app) renderAssets(sysDir string, makeDir string) {
+	dirs, err := a.fs.ReadDir(sysDir)
 	helpers.PanicIfError(err)
 	for _, dir := range dirs {
-		sysFileName := models.SysAssetsDir + "/" + dir.Name()
-		file, err := a.fs.ReadFile(sysFileName)
+		sys := sysDir + "/" + dir.Name()
+		md := makeDir + "/" + dir.Name()
+		if dir.IsDir() {
+			_ = os.MkdirAll(md, 0755)
+			a.renderAssets(sys, md)
+			continue
+		}
+		file, err := a.fs.ReadFile(sys)
 		helpers.PanicIfError(err)
-		err = helpers.WriteFile(models.AssetsDir+"/"+dir.Name(), bytes.NewBuffer(file))
+		err = helpers.WriteFile(md, bytes.NewBuffer(file))
 	}
 }
 
