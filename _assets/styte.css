@@ -72,12 +72,6 @@ a {
     text-decoration: none;
 }
 
-a:hover {
-    background-color: var(--main-blue-color);
-    color: var(--main-white-color);
-    text-decoration: none;
-}
-
 blockquote {
     color: #6a6a6a;
     padding-left: 1rem;
