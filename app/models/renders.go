@@ -1,25 +1,45 @@
 package models
 
-type Input struct {
-	Config  Config
-	Post    RPost
-	Posts   []RPost
-	Tag     RTag
-	Tags    []RTag
+import "bytes"
+
+type BasePost struct {
+	Title     string
+	CreatedAt string
+}
+
+type ExtractedPost struct {
+	BasePost
+	FilePath string
+	Tags     []string
+	Raw      []byte
+}
+
+type RenderPost struct {
+	BasePost
+	URL     string
+	RawTags []string
+	Tags    []RenderTag
 	Content string
 }
 
-type RTag struct {
-	Name  string
-	Count int
-	Path  string
-	Posts []RPost
+type RenderTag struct {
+	Name     string
+	Count    int
+	Path     string
+	ColorHEX string
+	Posts    []RenderPost
 }
 
-type RPost struct {
-	Title   string
-	URL     string
-	Date    string
-	Tags    []string
+type TemplateInfo struct {
+	Path    string
+	Content *bytes.Buffer
+}
+
+type Input struct {
+	Config  Config
+	Post    RenderPost
+	Posts   []RenderPost
+	Tag     RenderTag
+	Tags    []RenderTag
 	Content string
 }

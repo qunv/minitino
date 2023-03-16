@@ -14,15 +14,25 @@ import (
 	"text/template"
 )
 
-var tagMap = make(map[string]*models.RTag)
-var rPosts []models.RPost
-var posts []models.Post
+var tagMap = make(map[string]*models.RenderTag)
+var rPosts []models.RenderPost
+var posts []models.ExtractedPost
 
 type app struct {
 	ctx           context.Context
 	fs            embed.FS
-	postExtractor extractor.Extractor[[]models.Post]
+	postExtractor extractor.Extractor[[]models.ExtractedPost]
 	config        models.Config
+}
+
+func getRenderTagsByKeys(tags []string) []models.RenderTag {
+	var resp []models.RenderTag
+	for _, t := range tags {
+		if rt, ok := tagMap[t]; ok {
+			resp = append(resp, *rt)
+		}
+	}
+	return resp
 }
 
 func (a app) Run() {
@@ -32,11 +42,13 @@ func (a app) Run() {
 	for _, p := range posts {
 		url := a.buildPostUrl(p.CreatedAt, p.Title)
 		a.handleTag(p.Tags, url, p.CreatedAt, p.Title)
-		rPosts = append(rPosts, models.RPost{
-			URL:   url,
-			Title: p.Title,
-			Tags:  p.Tags,
-			Date:  helpers.ConvertDate(p.CreatedAt),
+		rPosts = append(rPosts, models.RenderPost{
+			BasePost: models.BasePost{
+				Title:     p.Title,
+				CreatedAt: helpers.ConvertDate(p.CreatedAt),
+			},
+			URL:  url,
+			Tags: getRenderTagsByKeys(p.Tags),
 		})
 	}
 
@@ -55,25 +67,30 @@ func (a app) handleTag(tags []string, path, date, title string) {
 		if curTag, ok := tagMap[tag]; ok {
 			curTag.Name = tag
 			curTag.Count++
-			curTag.Posts = append(curTag.Posts, models.RPost{
-				URL:   path,
-				Date:  date,
-				Title: title,
-				Tags:  tags,
+			curTag.Posts = append(curTag.Posts, models.RenderPost{
+				URL: path,
+				BasePost: models.BasePost{
+					CreatedAt: date,
+					Title:     title,
+				},
+				RawTags: tags,
 			})
 		} else {
 			tagPath := fmt.Sprintf("tags/%s", tag)
 			_ = os.MkdirAll(tagPath, 0755)
-			tagMap[tag] = &models.RTag{
-				Path:  "/" + tagPath,
-				Name:  tag,
-				Count: 1,
-				Posts: []models.RPost{
+			tagMap[tag] = &models.RenderTag{
+				Path:     "/" + tagPath,
+				Name:     tag,
+				Count:    1,
+				ColorHEX: helpers.RandomTagColors(len(tagMap)),
+				Posts: []models.RenderPost{
 					{
-						URL:   path,
-						Date:  date,
-						Title: title,
-						Tags:  tags,
+						BasePost: models.BasePost{
+							Title:     title,
+							CreatedAt: date,
+						},
+						URL:     path,
+						RawTags: tags,
 					},
 				},
 			}
@@ -154,10 +171,12 @@ func (a app) renderPostPages() {
 
 		input := models.Input{
 			Config: a.config,
-			Post: models.RPost{
-				Title:   p.Title,
-				Tags:    p.Tags,
-				Date:    helpers.ConvertDate(p.CreatedAt),
+			Post: models.RenderPost{
+				BasePost: models.BasePost{
+					Title:     p.Title,
+					CreatedAt: p.CreatedAt,
+				},
+				Tags:    getRenderTagsByKeys(p.Tags),
 				Content: string(pars),
 			},
 		}
@@ -241,7 +260,7 @@ func (a app) renderTagsPage() {
 	)
 	helpers.PanicIfError(err)
 	b := &bytes.Buffer{}
-	var tags []models.RTag
+	var tags []models.RenderTag
 	for _, tag := range tagMap {
 		tags = append(tags, *tag)
 	}
@@ -268,6 +287,15 @@ func (a app) renderTagDetailPage() {
 		helpers.PanicIfError(err)
 
 		b := &bytes.Buffer{}
+
+		var ps []models.RenderPost
+
+		for _, post := range tag.Posts {
+			post.Tags = getRenderTagsByKeys(post.RawTags)
+			ps = append(ps, post)
+		}
+
+		tag.Posts = ps
 
 		input := models.Input{
 			Config: a.config,

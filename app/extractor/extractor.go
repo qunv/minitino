@@ -13,7 +13,7 @@ type Extractor[O any] interface {
 	Extract() O
 }
 
-func NewPostExtractor(source string) Extractor[[]models.Post] {
+func NewPostExtractor(source string) Extractor[[]models.ExtractedPost] {
 	return &postExtractor{
 		dirPath: source,
 	}
@@ -23,10 +23,10 @@ type postExtractor struct {
 	dirPath string
 }
 
-func (p postExtractor) Extract() []models.Post {
+func (p postExtractor) Extract() []models.ExtractedPost {
 	dirs, err := helpers.ReadDir(p.dirPath)
 	helpers.PanicIfError(err)
-	var posts []models.Post
+	var posts []models.ExtractedPost
 	for i := len(dirs) - 1; i >= 0; i-- {
 		dir := dirs[i]
 		fileName := dir.Name()
@@ -37,12 +37,14 @@ func (p postExtractor) Extract() []models.Post {
 		title := p.extractTitle(file)
 		tags := p.extractTags(file)
 
-		posts = append(posts, models.Post{
-			FilePath:  filePath,
-			Content:   file.Bytes(),
-			Title:     title,
-			Tags:      tags,
-			CreatedAt: createdAt,
+		posts = append(posts, models.ExtractedPost{
+			BasePost: models.BasePost{
+				Title:     title,
+				CreatedAt: createdAt,
+			},
+			FilePath: filePath,
+			Raw:      file.Bytes(),
+			Tags:     tags,
 		})
 	}
 	return posts
