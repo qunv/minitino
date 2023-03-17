@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"github.com/qunv/minitino/app/helpers"
 	"github.com/qunv/minitino/app/models"
-	"log"
 	"regexp"
 	"strings"
 )
@@ -33,14 +32,16 @@ func (p postExtractor) Extract() []models.ExtractedPost {
 		filePath := p.dirPath + "/" + fileName
 		file, err := helpers.ReadFile(filePath)
 		helpers.PanicIfError(err)
-		createdAt := fileName[0:10]
+		createdAt := p.extractDate(file)
 		title := p.extractTitle(file)
 		tags := p.extractTags(file)
+		description := p.extractDescription(file)
 
 		posts = append(posts, models.ExtractedPost{
 			BasePost: models.BasePost{
-				Title:     title,
-				CreatedAt: createdAt,
+				Title:       title,
+				CreatedAt:   helpers.ConvertDate(createdAt),
+				Description: description,
 			},
 			FilePath: filePath,
 			Raw:      file.Bytes(),
@@ -53,15 +54,29 @@ func (p postExtractor) Extract() []models.ExtractedPost {
 func (p postExtractor) extractTitle(file *bytes.Buffer) string {
 	fileBytes := file.Bytes()
 
-	title := strings.Split(string(fileBytes), "\n")[0]
-	match, err := regexp.MatchString("^\\[comment\\]: <> \\(.*\\)$", title)
-	helpers.PanicIfError(err)
-	if !match {
-		log.Println("Missing title!")
-		panic("Missing title")
-	}
+	r := regexp.MustCompile(`\[title\]: <> \(.*?\)`)
+	title := r.FindString(string(fileBytes))
+	title = strings.ReplaceAll(title, "[title]: <> (", "")
+	title = strings.ReplaceAll(title, ")", "")
+	return title
+}
 
-	title = strings.ReplaceAll(title, "[comment]: <> (", "")
+func (p postExtractor) extractDescription(file *bytes.Buffer) string {
+	fileBytes := file.Bytes()
+
+	r := regexp.MustCompile(`\[description\]: <> \(.*?\)`)
+	title := r.FindString(string(fileBytes))
+	title = strings.ReplaceAll(title, "[description]: <> (", "")
+	title = strings.ReplaceAll(title, ")", "")
+	return title
+}
+
+func (p postExtractor) extractDate(file *bytes.Buffer) string {
+	fileBytes := file.Bytes()
+
+	r := regexp.MustCompile(`\[date\]: <> \(.*?\)`)
+	title := r.FindString(string(fileBytes))
+	title = strings.ReplaceAll(title, "[date]: <> (", "")
 	title = strings.ReplaceAll(title, ")", "")
 	return title
 }
@@ -69,16 +84,11 @@ func (p postExtractor) extractTitle(file *bytes.Buffer) string {
 func (p postExtractor) extractTags(file *bytes.Buffer) []string {
 	fileBytes := file.Bytes()
 
-	tags := strings.Split(string(fileBytes), "\n\n")[1]
-	match, err := regexp.MatchString("^\\[comment\\]: <> \\(.*\\)$", tags)
-	helpers.PanicIfError(err)
+	r := regexp.MustCompile(`\[tags\]: <> \(.*?\)`)
+	tags := r.FindString(string(fileBytes))
 
-	if !match {
-		log.Println("Missing tags format!")
-		panic("Missing tags")
-	}
-
-	tags = strings.ReplaceAll(tags, "[comment]: <> (", "")
+	tags = strings.ReplaceAll(tags, "[tags]: <> (", "")
 	tags = strings.ReplaceAll(tags, ")", "")
+
 	return strings.Split(tags, ",")
 }

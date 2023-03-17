@@ -3,8 +3,9 @@ package models
 import "bytes"
 
 type BasePost struct {
-	Title     string
-	CreatedAt string
+	Title       string
+	CreatedAt   string
+	Description string
 }
 
 type ExtractedPost struct {

@@ -41,11 +41,12 @@ func (a app) Run() {
 	posts = a.postExtractor.Extract()
 	for _, p := range posts {
 		url := a.buildPostUrl(p.CreatedAt, p.Title)
-		a.handleTag(p.Tags, url, p.CreatedAt, p.Title)
+		a.handleTag(p, url)
 		rPosts = append(rPosts, models.RenderPost{
 			BasePost: models.BasePost{
-				Title:     p.Title,
-				CreatedAt: helpers.ConvertDate(p.CreatedAt),
+				Title:       p.Title,
+				Description: p.Description,
+				CreatedAt:   p.CreatedAt,
 			},
 			URL:  url,
 			Tags: getRenderTagsByKeys(p.Tags),
@@ -62,18 +63,19 @@ func (a app) Run() {
 	a.renderPoem()
 }
 
-func (a app) handleTag(tags []string, path, date, title string) {
-	for _, tag := range tags {
+func (a app) handleTag(extractedPost models.ExtractedPost, url string) {
+	for _, tag := range extractedPost.Tags {
 		if curTag, ok := tagMap[tag]; ok {
 			curTag.Name = tag
 			curTag.Count++
 			curTag.Posts = append(curTag.Posts, models.RenderPost{
-				URL: path,
+				URL: url,
 				BasePost: models.BasePost{
-					CreatedAt: date,
-					Title:     title,
+					CreatedAt:   extractedPost.CreatedAt,
+					Title:       extractedPost.Title,
+					Description: extractedPost.Description,
 				},
-				RawTags: tags,
+				RawTags: extractedPost.Tags,
 			})
 		} else {
 			tagPath := fmt.Sprintf("tags/%s", tag)
@@ -86,11 +88,12 @@ func (a app) handleTag(tags []string, path, date, title string) {
 				Posts: []models.RenderPost{
 					{
 						BasePost: models.BasePost{
-							Title:     title,
-							CreatedAt: date,
+							CreatedAt:   extractedPost.CreatedAt,
+							Title:       extractedPost.Title,
+							Description: extractedPost.Description,
 						},
-						URL:     path,
-						RawTags: tags,
+						URL:     url,
+						RawTags: extractedPost.Tags,
 					},
 				},
 			}
@@ -173,8 +176,9 @@ func (a app) renderPostPages() {
 			Config: a.config,
 			Post: models.RenderPost{
 				BasePost: models.BasePost{
-					Title:     p.Title,
-					CreatedAt: p.CreatedAt,
+					Title:       p.Title,
+					CreatedAt:   p.CreatedAt,
+					Description: p.Description,
 				},
 				Tags:    getRenderTagsByKeys(p.Tags),
 				Content: string(pars),
