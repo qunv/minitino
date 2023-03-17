@@ -338,7 +338,8 @@ func (a app) renderRSS() {
 }
 
 func (a app) createPostIndexFile(date, title string, b *bytes.Buffer) {
-	dateFolder := strings.ReplaceAll(date, "-", "/")
+	var cvt = helpers.YYYmmDD(date)
+	dateFolder := strings.ReplaceAll(cvt, "-", "/")
 	dir := "posts/" + dateFolder + "/" + strings.ReplaceAll(title, " ", "-")
 	_ = os.MkdirAll(dir, 0755)
 	err := helpers.WriteFile(dir+"/index.html", b)
@@ -346,6 +347,7 @@ func (a app) createPostIndexFile(date, title string, b *bytes.Buffer) {
 }
 
 func (a app) buildPostUrl(date string, title string) string {
-	dateFolder := strings.ReplaceAll(date, "-", "/")
+	var cvt = helpers.YYYmmDD(date)
+	dateFolder := strings.ReplaceAll(cvt, "-", "/")
 	return "/posts/" + dateFolder + "/" + strings.ReplaceAll(title, " ", "-")
 }
