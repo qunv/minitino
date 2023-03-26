@@ -14,15 +14,25 @@ import (
 	"text/template"
 )
 
-var tagMap = make(map[string]*models.RTag)
-var rPosts []models.RPost
-var posts []models.Post
+var tagMap = make(map[string]*models.RenderTag)
+var rPosts []models.RenderPost
+var posts []models.ExtractedPost
 
 type app struct {
 	ctx           context.Context
 	fs            embed.FS
-	postExtractor extractor.Extractor[[]models.Post]
+	postExtractor extractor.Extractor[[]models.ExtractedPost]
 	config        models.Config
+}
+
+func getRenderTagsByKeys(tags []string) []models.RenderTag {
+	var resp []models.RenderTag
+	for _, t := range tags {
+		if rt, ok := tagMap[t]; ok {
+			resp = append(resp, *rt)
+		}
+	}
+	return resp
 }
 
 func (a app) Run() {
@@ -31,48 +41,59 @@ func (a app) Run() {
 	posts = a.postExtractor.Extract()
 	for _, p := range posts {
 		url := a.buildPostUrl(p.CreatedAt, p.Title)
-		a.handleTag(p.Tags, url, p.CreatedAt, p.Title)
-		rPosts = append(rPosts, models.RPost{
-			URL:   url,
-			Title: p.Title,
-			Tags:  p.Tags,
-			Date:  helpers.ConvertDate(p.CreatedAt),
+		a.handleTag(p, url)
+		rPosts = append(rPosts, models.RenderPost{
+			BasePost: models.BasePost{
+				Title:       p.Title,
+				Description: p.Description,
+				CreatedAt:   p.CreatedAt,
+			},
+			URL:  url,
+			Tags: getRenderTagsByKeys(p.Tags),
 		})
 	}
 
-	a.renderAssets()
+	a.renderAssets(models.SysAssetsDir, models.AssetsDir)
 	a.renderIndexPage()
 	a.renderPostPages()
 	a.renderTagsPage()
 	a.renderTagDetailPage()
 	a.renderAbout()
 	a.renderRSS()
+	a.renderPoem()
 }
 
-func (a app) handleTag(tags []string, path, date, title string) {
-	for _, tag := range tags {
+func (a app) handleTag(extractedPost models.ExtractedPost, url string) {
+	for _, tag := range extractedPost.Tags {
 		if curTag, ok := tagMap[tag]; ok {
 			curTag.Name = tag
 			curTag.Count++
-			curTag.Posts = append(curTag.Posts, models.RPost{
-				URL:   path,
-				Date:  date,
-				Title: title,
-				Tags:  tags,
+			curTag.Posts = append(curTag.Posts, models.RenderPost{
+				URL: url,
+				BasePost: models.BasePost{
+					CreatedAt:   extractedPost.CreatedAt,
+					Title:       extractedPost.Title,
+					Description: extractedPost.Description,
+				},
+				RawTags: extractedPost.Tags,
 			})
 		} else {
 			tagPath := fmt.Sprintf("tags/%s", tag)
 			_ = os.MkdirAll(tagPath, 0755)
-			tagMap[tag] = &models.RTag{
-				Path:  "/" + tagPath,
-				Name:  tag,
-				Count: 1,
-				Posts: []models.RPost{
+			tagMap[tag] = &models.RenderTag{
+				Path:     "/" + tagPath,
+				Name:     tag,
+				Count:    1,
+				ColorHEX: helpers.RandomTagColors(len(tagMap)),
+				Posts: []models.RenderPost{
 					{
-						URL:   path,
-						Date:  date,
-						Title: title,
-						Tags:  tags,
+						BasePost: models.BasePost{
+							CreatedAt:   extractedPost.CreatedAt,
+							Title:       extractedPost.Title,
+							Description: extractedPost.Description,
+						},
+						URL:     url,
+						RawTags: extractedPost.Tags,
 					},
 				},
 			}
@@ -85,22 +106,30 @@ func (a app) makeDir() {
 
 	_ = os.MkdirAll(models.SysPostsDir, 0755)
 	_ = os.MkdirAll(models.SysAboutDir, 0755)
+	_ = os.MkdirAll(models.SysPoemDir, 0755)
 
 	_ = os.MkdirAll(models.PostsDir, 0755)
 	_ = os.MkdirAll(models.AssetsDir, 0755)
 	_ = os.MkdirAll(models.AboutDir, 0755)
 	_ = os.MkdirAll(models.ImagesDir, 0755)
 	_ = os.MkdirAll(models.TagsDir, 0755)
+	_ = os.MkdirAll(models.PoemDir, 0755)
 }
 
-func (a app) renderAssets() {
-	dirs, err := a.fs.ReadDir("_assets")
+func (a app) renderAssets(sysDir string, makeDir string) {
+	dirs, err := a.fs.ReadDir(sysDir)
 	helpers.PanicIfError(err)
 	for _, dir := range dirs {
-		sysFileName := models.SysAssetsDir + "/" + dir.Name()
-		file, err := a.fs.ReadFile(sysFileName)
+		sys := sysDir + "/" + dir.Name()
+		md := makeDir + "/" + dir.Name()
+		if dir.IsDir() {
+			_ = os.MkdirAll(md, 0755)
+			a.renderAssets(sys, md)
+			continue
+		}
+		file, err := a.fs.ReadFile(sys)
 		helpers.PanicIfError(err)
-		err = helpers.WriteFile(models.AssetsDir+"/"+dir.Name(), bytes.NewBuffer(file))
+		err = helpers.WriteFile(md, bytes.NewBuffer(file))
 	}
 }
 
@@ -145,10 +174,13 @@ func (a app) renderPostPages() {
 
 		input := models.Input{
 			Config: a.config,
-			Post: models.RPost{
-				Title:   p.Title,
-				Tags:    p.Tags,
-				Date:    helpers.ConvertDate(p.CreatedAt),
+			Post: models.RenderPost{
+				BasePost: models.BasePost{
+					Title:       p.Title,
+					CreatedAt:   p.CreatedAt,
+					Description: p.Description,
+				},
+				Tags:    getRenderTagsByKeys(p.Tags),
 				Content: string(pars),
 			},
 		}
@@ -192,6 +224,37 @@ func (a app) renderAbout() {
 	helpers.PanicIfError(err)
 }
 
+func (a app) renderPoem() {
+	t, err := template.ParseFS(
+		a.fs,
+		"_templates/root.gohtml",
+		"_templates/poem/poemBody.gohtml",
+		"_templates/poem/poemSubHeader.gohtml",
+	)
+	helpers.PanicIfError(err)
+
+	b := &bytes.Buffer{}
+
+	file, err := helpers.ReadFile("_poem/poem.md")
+	if err != nil {
+		return
+	}
+
+	pars := blackfriday.MarkdownCommon(file.Bytes())
+
+	input := models.Input{
+		Config:  a.config,
+		Content: string(pars),
+	}
+
+	err = t.Execute(b, input)
+	if err != nil {
+		panic(err)
+	}
+	err = helpers.WriteFile("poem/index.html", b)
+	helpers.PanicIfError(err)
+}
+
 func (a app) renderTagsPage() {
 	t, err := template.ParseFS(
 		a.fs,
@@ -201,7 +264,7 @@ func (a app) renderTagsPage() {
 	)
 	helpers.PanicIfError(err)
 	b := &bytes.Buffer{}
-	var tags []models.RTag
+	var tags []models.RenderTag
 	for _, tag := range tagMap {
 		tags = append(tags, *tag)
 	}
@@ -229,6 +292,15 @@ func (a app) renderTagDetailPage() {
 
 		b := &bytes.Buffer{}
 
+		var ps []models.RenderPost
+
+		for _, post := range tag.Posts {
+			post.Tags = getRenderTagsByKeys(post.RawTags)
+			ps = append(ps, post)
+		}
+
+		tag.Posts = ps
+
 		input := models.Input{
 			Config: a.config,
 			Tag:    *tag,
@@ -253,20 +325,21 @@ func (a app) renderRSS() {
 	b.WriteString("<link>https://qunv.github.io/</link>\n")
 	for _, post := range posts {
 		dateFolder := strings.ReplaceAll(post.CreatedAt, "-", "/")
-		path := "Posts/" + dateFolder + "/" + strings.ReplaceAll(post.Title, " ", "-")
+		path := "posts/" + dateFolder + "/" + strings.ReplaceAll(post.Title, " ", "-")
 		b.WriteString("<item>\n")
 		b.WriteString("<title>" + post.Title + "</title>\n")
 		b.WriteString("<link>https://qunv.github.io/" + path + "</link>\n")
 		b.WriteString("</item>\n")
 	}
 	b.WriteString("</channel>\n")
-	b.WriteString("</rss>")
+	b.WriteString("</rss>\n")
 	err := helpers.WriteFile("rss.xml", &b)
 	helpers.PanicIfError(err)
 }
 
 func (a app) createPostIndexFile(date, title string, b *bytes.Buffer) {
-	dateFolder := strings.ReplaceAll(date, "-", "/")
+	var cvt = helpers.YYYmmDD(date)
+	dateFolder := strings.ReplaceAll(cvt, "-", "/")
 	dir := "posts/" + dateFolder + "/" + strings.ReplaceAll(title, " ", "-")
 	_ = os.MkdirAll(dir, 0755)
 	err := helpers.WriteFile(dir+"/index.html", b)
@@ -274,6 +347,7 @@ func (a app) createPostIndexFile(date, title string, b *bytes.Buffer) {
 }
 
 func (a app) buildPostUrl(date string, title string) string {
-	dateFolder := strings.ReplaceAll(date, "-", "/")
+	var cvt = helpers.YYYmmDD(date)
+	dateFolder := strings.ReplaceAll(cvt, "-", "/")
 	return "/posts/" + dateFolder + "/" + strings.ReplaceAll(title, " ", "-")
 }

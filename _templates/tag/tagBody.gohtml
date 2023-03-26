@@ -1,14 +1,19 @@
 {{- define "body" }}
     <ul class="post-list">
         {{- range .Tag.Posts }}
-            <li>
-                <a class="post-link" href="{{ .URL }}">{{ .Title }}</a>
-                <time datetime="2017-01-15T00:00:00+00:00">{{ .Date }}</time>
-                <p>
+            <li class="post-link-container">
+                <a class="post-link" href="{{ .URL }}">
+                    <h3 class="post-link-title">{{ .Title }}</h3>
+                    <div class="post-link-subtext">
+                        {{ .Description }}
+                    </div>
+                </a>
+                <div class="post-link-metadata">
+                    <time datetime="2017-01-15T00:00:00+00:00">{{ .CreatedAt }}</time>
                     {{- range .Tags }}
-                        <a href="/tags/{{ . }}" style="color: #aaa">#{{ . }} </a>
+                        <a class="tag" href="/tags/{{ .Name }}" style="background: {{ .ColorHEX }}">#{{ .Name }}</a>
                     {{- end }}
-                </p>
+                </div>
             </li>
         {{- end }}
     </ul>
