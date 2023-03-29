@@ -56,9 +56,13 @@ Create posts by create markdown file inside `_posts` folder. And we have several
 File contents start with 2 line:
 
 ```
-[comment]: <> (Rambling a little) // your post title
+[title]: <> (Rambling a little) // your post title
 
-[comment]: <> (self, self2) // your post tags
+[description]: <> (description here) // your post description
+
+[date]: <> (2020-10-15) // your post date, format yyyy-mm-dd
+
+[tags]: <> (self, self2) // your post tags
 ```
 
 Finally, run `./minitino` one again.
