@@ -5,10 +5,10 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"github.com/qunv/minitino/app/adapter"
 	"github.com/qunv/minitino/app/extractor"
 	"github.com/qunv/minitino/app/helpers"
 	"github.com/qunv/minitino/app/models"
-	"github.com/russross/blackfriday"
 	"os"
 	"strings"
 	"text/template"
@@ -170,7 +170,7 @@ func (a app) renderPostPages() {
 		file, err := helpers.ReadFile(p.FilePath)
 		helpers.PanicIfError(err)
 
-		pars := blackfriday.MarkdownCommon(file.Bytes())
+		pars := adapter.MarkdownCustom(file.Bytes())
 
 		input := models.Input{
 			Config: a.config,
@@ -209,7 +209,7 @@ func (a app) renderAbout() {
 		return
 	}
 
-	pars := blackfriday.MarkdownCommon(file.Bytes())
+	pars := adapter.MarkdownCustom(file.Bytes())
 
 	input := models.Input{
 		Config:  a.config,
@@ -240,7 +240,7 @@ func (a app) renderPoem() {
 		return
 	}
 
-	pars := blackfriday.MarkdownCommon(file.Bytes())
+	pars := adapter.MarkdownCustom(file.Bytes())
 
 	input := models.Input{
 		Config:  a.config,
