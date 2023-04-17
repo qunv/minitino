@@ -32,7 +32,16 @@
             {{- template "body" . }}
         </section>
         <div class="copyright">
-            <p>Copyright &copy; 2021 by <a href="/">{{ .Config.RootName }}</a></p>
+            <p id="copyright">
+                Copyright &copy;
+                2021-
+                <script>document.getElementById('copyright').appendChild(document.createTextNode(new Date().getFullYear()))</script>
+                🚀 <a href="/">{{ .Config.RootName }}</a>
+            </p>
+            <p style="margin-top: 0">
+                <a href="{{ .Config.FindOn.Github }}"><i class="fa fa-github"></i></a>
+                <a href="{{ .Config.FindOn.Twitter }}"><i class="fa fa-twitter"></i></a>
+            </p>
         </div>
     </div>
 </div>
